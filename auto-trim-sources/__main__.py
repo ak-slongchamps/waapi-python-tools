@@ -1,7 +1,8 @@
-from waapi import WaapiClient, CannotConnectToWaapiException
-from pprint import pprint
-import argparse
+from waapi import WaapiClient
 from scipy.io import wavfile
+from pathlib import Path
+import platform
+import argparse
 
 # Define arguments for the script
 parser = argparse.ArgumentParser(description='Automatically trim the sources for specified objects (ID).')
@@ -34,12 +35,11 @@ def get_convert_sample_function(data):
     return lambda a : base_convert(a.max())
 
 try:
-
     # Connecting to Waapi using default URL
     with WaapiClient() as client:
 
         selected = []
-        
+
         # if no ID is passed as argument, use the selected object from the project
         if args.ids is None or len(args.ids) == 0:
             selected  = client.call("ak.wwise.ui.getSelectedObjects")['objects']
@@ -58,11 +58,17 @@ try:
 
             sources = client.call("ak.wwise.core.object.get", call_args, options=options)
 
+            user_home = str(Path.home()) + '/'
+
             for source in sources['return']:
+                wav_path = source['originalWavFilePath']
+
+                if platform.system() == 'Darwin':
+                    wav_path = wav_path.replace('Y:\\', user_home).replace('Z:\\', '').replace('\\', '/')
 
                 # Open the WAV file
-                sample_rate, data = wavfile.read(source['originalWavFilePath'])
-                print(f"Processing {source['originalWavFilePath']}...")
+                sample_rate, data = wavfile.read(wav_path)
+                print(f"Processing {wav_path}...")
 
                 duration = data.shape[0] / sample_rate
                 channels =  data.shape[1] if len(data.shape) == 2 else 1
@@ -111,7 +117,7 @@ try:
                 set_source = { "object":source['id'] }
                 if (not args.no_trim_begin) and trim_begin_pos > 0:
                     set_source["@TrimBegin"] = trim_begin_pos / sample_rate
-                    
+
                 if (not args.no_trim_end) and trim_end_pos < num_samples - 1:
                     set_source["@TrimEnd"] = trim_end_pos / sample_rate
                     set_sound["@InitialDelay"] = trim_end_pos / sample_rate

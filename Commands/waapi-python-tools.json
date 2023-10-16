@@ -32,9 +32,9 @@
             "id":"ak.auto-rename-container",
             "displayName":"Auto Rename Container",
             "defaultShortcut":"",
-            "program":"py.exe",
+            "program":"python3",
             "startMode":"MultipleSelectionMultipleProcesses",
-            "args":"-3 ${CurrentCommandDirectory}\\..\\auto-rename-container ${id}",
+            "args":"${CurrentCommandDirectory}/../auto-rename-container ${id}",
             "cwd":"",
             "contextMenu":{
                     "basePath":""
@@ -45,9 +45,9 @@
             "id":"ak.auto-trim",
             "displayName":"Auto Trim Sources",
             "defaultShortcut":"",
-            "program":"py.exe",
+            "program":"python3",
             "startMode":"MultipleSelectionSingleProcessSpaceSeparated",
-            "args":"-3 ${CurrentCommandDirectory}\\..\\auto-trim-sources ${id}",
+            "args":"${CurrentCommandDirectory}/../auto-trim-sources",
             "cwd":"",
             "contextMenu":{
                     "basePath":""
